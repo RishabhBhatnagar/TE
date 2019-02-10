@@ -1,0 +1,59 @@
+CREATE TABLE user(
+	uid int PRIMARY KEY,
+	occupation varchar(10),
+	stay_current_city int,
+	gender char(1),
+	age int,
+	marital_status varchar(25)
+)
+##############
+CREATE TABLE company(
+	year_establish int,
+	cid int PRIMARY KEY,
+	public_sentiment varchar(10), -- RANDOM
+	gstn varchar(20) UNIQUE
+)
+#########
+CREATE TABLE company_gst_type(
+	FOREIGN KEY(cid) REFERENCES company(cid),
+	gst_type varchar(10)
+)
+##########
+create table stay_city_year(
+    foreign key(uid) REferences user(uid),
+    temp_year number(4),
+    permanent_year number(4),
+);
+#############
+CREATE table product(
+	pid int PRIMARY KEY,
+	pname varchar(20),
+	category number(3),
+	base_price number(3),
+	discount float,
+	location_on_rack int, --- 0,1,2,3
+)
+#############
+CREATE TABLE outlet(
+	oid int PRIMARY KEY,
+	neighbourhood varchar(10)
+	competition_distance int,
+	establish_year int,
+	size varchar(10)
+)
+########
+CREATE TABLE user_buys_product(
+	FOREIGN KEY(uid) REFERENCES user(uid),
+	FOREIGN KEY(pid) REFERENCES product(pid)
+)
+#########
+CREATE TABLE product_sold_by_outlet(
+	FOREIGN KEY(pid) REFERENCES product(pid),
+	FOREIGN KEY(oid) REFERENCES outlet(oid)
+)
+#########
+CREATE TABLE company_makes_product(
+	FOREIGN KEY(cid) REFERENCES company(cid),
+	FOREIGN KEY(pid) REFERENCES product(pid)
+)
+##########
