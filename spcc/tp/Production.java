@@ -1,6 +1,6 @@
 enum TypeSymbol {
     // only good thing I found in Java programming language.
-    TERMINAL, NON_TERMINAL
+    TERMINAL, NON_TERMINAL,
 }
 
 class Symbol {
