@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 enum TypeSymbol {
     // only good thing I found in Java programming language.
     TERMINAL, NON_TERMINAL
@@ -23,7 +20,7 @@ class Symbol {
 
 class ProductionRule {
     final String productionString;
-    List<Symbol> symbols;
+    LinkedSymbols symbols = null;
 
     /*
      * This class will store specific rule for the given non terminal.
@@ -48,7 +45,7 @@ class ProductionRule {
          * */
         String productionString = this.productionString;    //creating a temporary copy of production string.
 
-        symbols = new ArrayList<>();                        // all the parsed symbols will be stored here.
+        symbols = new LinkedSymbols();                        // all the parsed symbols will be stored here.
 
         // Parsing the rule to extract terminal and non-terminals from the production string.
         while (productionString.length() != 0) {
@@ -69,7 +66,7 @@ class ProductionRule {
                     productionString = productionString.substring(lenNonTerminal, n);
 
                     // adding nonTerminal to the set of seenSymbols
-                    symbols.add(new Symbol(nonTerminal, TypeSymbol.NON_TERMINAL));
+                    symbols.append(new Symbol(nonTerminal, TypeSymbol.NON_TERMINAL));
                 }
             }
 
@@ -94,7 +91,11 @@ class ProductionRule {
                     if (productionString.startsWith(nonTerminal) || productionString.length() == 0) {
                         found = true;
                         // adding extracted terminal to symbols.
-                        symbols.add(new Symbol(terminal, TypeSymbol.TERMINAL));
+                        symbols.append(new Symbol(terminal, TypeSymbol.TERMINAL));
+
+                        if(productionString.length() == 0){
+                            break;
+                        }
 
                         // adding the current non-terminal to symbol_table.
                         int lenNonTerminal = nonTerminal.length();
@@ -102,7 +103,7 @@ class ProductionRule {
                         // removing nonTerminal string from start of the productionString.
                         productionString = productionString.substring(lenNonTerminal, n);
                         // adding nonTerminal to the set of seenSymbols
-                        symbols.add(new Symbol(nonTerminal, TypeSymbol.NON_TERMINAL));
+                        symbols.append(new Symbol(nonTerminal, TypeSymbol.NON_TERMINAL));
 
                         break;
                     }
@@ -183,6 +184,10 @@ class Grammar {
     // This has all the production rules defined.
     int nProductions = 0;     // number of productions.
     Production[] productions; // All the productions
+    String grammar;
+    String nonTerminalSeparator;
+    String productionAssignment;
+    String productionDelimiter;
 
     public Production[] buildGrammarFromString(String grammar, String nonTerminalSeparator, String productionAssignment, String productionDelimiter) {
         /* This method provides user to update the grammar without creating new Grammar instance from existing object.
@@ -199,6 +204,12 @@ class Grammar {
         // resetting the instance variables.
         nProductions = stringProductionRules.length;
         productions = new Production[nProductions];
+
+        //
+        this.grammar = grammar;
+        this.nonTerminalSeparator = nonTerminalSeparator;
+        this.productionAssignment = productionAssignment;
+        this.productionDelimiter = productionDelimiter;
 
         // for all production strings in the productionRulesStrings, parse and create a production.
         for (int i = 0; i < nProductions; i++) {
@@ -242,5 +253,42 @@ class Grammar {
                 "->", // productionAssignment,
                 "\\|"// productionDelimiter
         );
+    }
+
+    void addProduction(String production){
+        // This is a very inefficient way.
+        // It is almost equivalent to creating a new object.
+        // This appends new string to the grammar and rebuilds it.
+        this.grammar += this.nonTerminalSeparator + production;
+        buildGrammarFromString(
+                this.grammar,
+                this.nonTerminalSeparator,
+                this.productionAssignment,
+                this.productionDelimiter
+        );
+    }
+
+    Production getProductionOfNonTerminal(String nonTerminal){
+        for(Production production: this.productions){
+            if(production.nonTerminal.data.equals(nonTerminal)){
+                return production;
+            }
+        }
+        return null;
+    }
+
+    String getPrintableGrammar(){
+        String grammarString = "";
+        for(Production production:this.productions){
+            grammarString += production.nonTerminal + this.productionAssignment;
+            for(ProductionRule productionRule: production.productionRules){
+                for(int i=0; i<productionRule.symbols.count; i++){
+                    grammarString += productionRule.symbols.get(i);
+                }
+                grammarString += productionDelimiter.replace("\\", "");
+            }
+            grammarString += nonTerminalSeparator;
+        }
+        return grammarString;
     }
 }
