@@ -20,6 +20,7 @@ class Symbol {
 
 class ProductionRule {
     final String productionString;
+    Symbol nonTerminal;
     LinkedSymbols symbols = null;
 
     /*
@@ -112,13 +113,15 @@ class ProductionRule {
         }
     }
 
-    ProductionRule(String productionString, String[] nonTerminals) {
+    ProductionRule(String productionString, Symbol nonTerminal, String[] nonTerminals) {
+        this.nonTerminal = nonTerminal;
         this.productionString = productionString;
         this.separateAllSymbols(nonTerminals);
     }
 
-    ProductionRule(String productionString) {
+    ProductionRule(String productionString, Symbol nonTerminal) {
         this.productionString = productionString;
+        this.nonTerminal = nonTerminal;
     }
 }
 
@@ -165,7 +168,7 @@ class Production {
         // building productions from given production strings.
         productionRules = new ProductionRule[productionRulesStrings.length];
         for (int i = 0; i < nProductionRules; i++) {
-            productionRules[i] = new ProductionRule(productionRulesStrings[i]);
+            productionRules[i] = new ProductionRule(productionRulesStrings[i], nonTerminal);
         }
     }
 
@@ -188,6 +191,7 @@ class Grammar {
     String nonTerminalSeparator;
     String productionAssignment;
     String productionDelimiter;
+    Symbol startSymbol;
 
     public Production[] buildGrammarFromString(String grammar, String nonTerminalSeparator, String productionAssignment, String productionDelimiter) {
         /* This method provides user to update the grammar without creating new Grammar instance from existing object.
@@ -227,6 +231,7 @@ class Grammar {
         for (Production production : productions) {
             production.buildProductionRules(nonTerminals);  // separates non-terminals from the productions.
         }
+        this.startSymbol = productions[0].nonTerminal;
         return productions;
     }
 
@@ -240,6 +245,7 @@ class Grammar {
 
     Grammar(String grammarString, String nonTerminalSeparator, String productionAssignment, String productionDelimiter) {
         buildGrammarFromString(grammarString, nonTerminalSeparator, productionAssignment, productionDelimiter);
+        this.startSymbol = this.productions[0].nonTerminal;
     }
 
     Grammar() {
