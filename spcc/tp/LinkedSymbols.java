@@ -41,4 +41,15 @@ class LinkedSymbols {
             return current.symbol;
         }
     }
+    String getPrintable(){
+        String op = "";
+        SymbolNode current = this.start;
+        int i = 0;
+        while (i != this.count){
+            i += 1;
+            op += current.symbol.data;
+            current = current.next;
+        }
+        return op;
+    }
 }
