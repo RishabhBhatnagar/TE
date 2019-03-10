@@ -10,8 +10,5 @@ public class OperatorPredenceParser {
 
         Dictionary<Symbol, List<Symbol>> firstSet= first_follow.getFirstSet(grammar);
         Dictionary<Symbol, List<Symbol>> followSet = first_follow.getFollowSet(grammar);
-
-
-
     }
 }

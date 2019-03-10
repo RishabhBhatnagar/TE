@@ -156,10 +156,10 @@ class Production {
         String[] parts = prodStr.split(this.productionAssignment, 2);
 
         // assigning lhs symbol to non-terminal for current production.
-        this.nonTerminal = new Symbol(parts[0].strip(), TypeSymbol.NON_TERMINAL);
+        this.nonTerminal = new Symbol(parts[0].trim(), TypeSymbol.NON_TERMINAL);
 
         // trimming white space from production
-        String allProductions = parts[1].strip();
+        String allProductions = parts[1].trim();
 
         // all the rhs of productions for a given terminal in string format.
         String[] productionRulesStrings = allProductions.split(productionSplitBy);

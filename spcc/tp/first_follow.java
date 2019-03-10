@@ -3,8 +3,13 @@ public class first_follow {
     public static void main(String[] args) {
         String prodRules = "A -> BaC|aBC|B\nB -> Cd\nC -> c";
         Grammar grammar = new Grammar(prodRules);
+
+        System.out.println("The grammar is:");
         System.out.println(grammar.getPrintableGrammar());
+        System.out.println();
+        System.out.print("First for the given grammar  :");
         System.out.println(getFirstSet(grammar));
+        System.out.print("Follow for the given grammar :");
         System.out.println(getFollowSet(grammar));
     }
     static List<Symbol> getInitialSymbols(Production production){
@@ -113,3 +118,15 @@ public class first_follow {
         return getSet(followSet);
     }
 }
+
+
+/*
+OUTPUT:
+The grammar is:
+A->BaC|aBC|B|
+B->Cd|
+C->c|
+
+First for the given grammar  :{A=[c, a], C=[c], B=[c]}
+Follow for the given grammar :{A=[$], C=[$, d], B=[a, c, $]}
+* */
