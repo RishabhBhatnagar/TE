@@ -17,14 +17,21 @@ public class Ll1 {
         buildParsingTable();
     }
 
-    static boolean terminalExists(Production production, String targetTerminal) {
-        for (Symbol symbol : first_follow.getInitialSymbols(production)) {
+    static boolean terminalExists(ProductionRule productionRule, String targetTerminal) {
+        for (int i=0; i<productionRule.symbols.count; i++) {
+            Symbol symbol = productionRule.symbols.get(i);
             if (symbol.typeSymbol == TypeSymbol.TERMINAL) {
                 if (symbol.data.equals(targetTerminal)) {
                     return true;
                 }
             } else {
-                terminalExists(grammar.getProductionOfNonTerminal(symbol.data), targetTerminal);
+                for(ProductionRule _productionRule: grammar.getProductionOfNonTerminal(productionRule.nonTerminal.data).productionRules){
+                    if(symbol.data.equals(productionRule.nonTerminal.data))
+                        continue;
+                    if(terminalExists(_productionRule, targetTerminal)){
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -40,32 +47,33 @@ public class Ll1 {
             return sourceProductions.productionRules[0];
         } else {
             for (ProductionRule productionRule : sourceProductions.productionRules) {
-                if (terminalExists(grammar.getProductionOfNonTerminal(productionRule.nonTerminal.data), target.data)) {
+                if (terminalExists(productionRule, target.data)) {
                     return productionRule;
                 }
             }
         }
 
-        for (Production production : grammar.productions) {
+        for (Production production : Grammar.productions) {
             for (ProductionRule productionRule : production.productionRules) {
                 for (int i = 0; i < productionRule.symbols.count; i++) {
-                    if (productionRule.symbols.get(i).data == target.data) {
+                    if (productionRule.symbols.get(i).data.equals(target.data)) {
                         return productionRule;
                     }
                 }
             }
         }
+
         return null;
     }
 
-    static void buildParsingTable() {
+    private static void buildParsingTable() {
         parsingTable = new Hashtable<>();
         Enumeration<Symbol> nonTerminal = firstSet.keys();
         // Enumerating over all the non-terminals:
         while (nonTerminal.hasMoreElements()) {
             Symbol currentNonTerminal = nonTerminal.nextElement();
             List<Symbol> firstSymbols = firstSet.get(currentNonTerminal);
-            for (Symbol firstSymbol : firstSymbols) {
+            for (Symbol firstSymbol:firstSymbols) {
                 if (firstSymbol.data.equals(epsilon)) {
                     List<Symbol> _symbols1 = followSet.get(currentNonTerminal);
                     for (Symbol _symbol : _symbols1) {
@@ -115,7 +123,7 @@ public class Ll1 {
         }
         List<Symbol> allTerminalSymbols = grammar.getAllTerminals();
         List<String> allTerminalStrings = allTerminalSymbols.stream().map(symbol -> symbol.data).collect(Collectors.toList());
-        List<String> ip = tokenizeUsingList("id+id*id", allTerminalStrings);
+        List<String> ip = tokenizeUsingList(input, allTerminalStrings);
         ip.add("$");
         Stack<String> stack = new Stack<String>();
         stack.push("$");
@@ -153,6 +161,8 @@ public class Ll1 {
         // removing left recursion
         prodRules = LeftRecursion.removeLrGrammarString(prodRules);
         Ll1 ll1 = new Ll1(prodRules);
-        System.out.println(ll1.validateString("id", grammar.startSymbol));
+
+        // System.out.println(ll1.validateString("id", grammar.startSymbol));
+        System.out.println(parsingTable.toString());
     }
 }

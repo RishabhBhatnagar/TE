@@ -126,6 +126,11 @@ class ProductionRule {
         this.productionString = productionString;
         this.nonTerminal = nonTerminal;
     }
+
+    @Override
+    public String toString() {
+        return productionString;
+    }
 }
 
 class Production {
