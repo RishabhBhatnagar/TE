@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 enum TypeSymbol {
     // only good thing I found in Java programming language.
     TERMINAL, NON_TERMINAL,
@@ -177,7 +180,6 @@ class Production {
             production.separateAllSymbols(nonTerminals);
         }
     }
-
     Production(String productionString, String productionAssignment, String productionSplitBy) {
         buildProduction(productionString, productionAssignment, productionSplitBy);
     }
@@ -186,8 +188,8 @@ class Production {
 class Grammar {
     // This has all the production rules defined.
     int nProductions = 0;     // number of productions.
-    Production[] productions; // All the productions
-    String grammar;
+    static Production[] productions; // All the productions
+    static String grammar;
     String nonTerminalSeparator;
     String productionAssignment;
     String productionDelimiter;
@@ -296,5 +298,20 @@ class Grammar {
             grammarString += nonTerminalSeparator;
         }
         return grammarString;
+    }
+
+    List<Symbol> getAllTerminals(){
+        List<Symbol> allTerminals = new ArrayList<>();
+        for(Production production: productions){
+            for(ProductionRule productionRule: production.productionRules){
+                for(int i=0; i<productionRule.symbols.count; i++){
+                    Symbol currentSymbol = productionRule.symbols.get(i);
+                    if(currentSymbol.typeSymbol == TypeSymbol.TERMINAL){
+                        allTerminals.add(currentSymbol);
+                    }
+                }
+            }
+        }
+        return allTerminals;
     }
 }
