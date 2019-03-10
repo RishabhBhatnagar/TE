@@ -17,20 +17,23 @@ public class Ll1 {
         buildParsingTable();
     }
 
-    static boolean terminalExists(ProductionRule productionRule, String targetTerminal) {
-        for (int i=0; i<productionRule.symbols.count; i++) {
-            Symbol symbol = productionRule.symbols.get(i);
-            if (symbol.typeSymbol == TypeSymbol.TERMINAL) {
-                if (symbol.data.equals(targetTerminal)) {
-                    return true;
+    static boolean terminalExists(ProductionRule productionRule, String targetTerminal, Dictionary<Symbol, List<Symbol>> firstSet) {
+        Dictionary<String, Boolean> isSeen = new Hashtable<String, Boolean>();
+        Set<String> intermediateNonTerminals = new HashSet<String>();
+        for (int i = 0; i < productionRule.symbols.count; i++) {
+            Symbol currentSymbol = productionRule.symbols.get(i);
+            if (currentSymbol.data.equals(targetTerminal)) return true;
+            else if (currentSymbol.typeSymbol == TypeSymbol.NON_TERMINAL) {
+                if (isSeen.get(currentSymbol.data) == null) {
+                    intermediateNonTerminals.add(currentSymbol.data);
+                    isSeen.put(currentSymbol.data, true);
                 }
-            } else {
-                for(ProductionRule _productionRule: grammar.getProductionOfNonTerminal(productionRule.nonTerminal.data).productionRules){
-                    if(symbol.data.equals(productionRule.nonTerminal.data))
-                        continue;
-                    if(terminalExists(_productionRule, targetTerminal)){
-                        return true;
-                    }
+            }
+        }
+        for (String nonTerminal : intermediateNonTerminals) {
+            for (ProductionRule productionRule1 : grammar.getProductionOfNonTerminal(nonTerminal).productionRules) {
+                if (productionRule1.symbols.get(0).data.equals(targetTerminal)) {
+                    return true;
                 }
             }
         }
@@ -42,18 +45,10 @@ public class Ll1 {
          * This returns the production which generated the given terminal symbol.
          * This approach is flawed in one terms.
          * */
-        Production sourceProductions = grammar.getProductionOfNonTerminal(nonTerminal);
-        if (sourceProductions.nProductionRules == 1) {
-            return sourceProductions.productionRules[0];
-        } else {
-            for (ProductionRule productionRule : sourceProductions.productionRules) {
-                if (terminalExists(productionRule, target.data)) {
-                    return productionRule;
-                }
-            }
+        if (grammar.getProductionOfNonTerminal(nonTerminal).productionRules.length == 1) {
+            return grammar.getProductionOfNonTerminal(nonTerminal).productionRules[0];
         }
-
-        for (Production production : Grammar.productions) {
+        for (Production production : grammar.productions) {
             for (ProductionRule productionRule : production.productionRules) {
                 for (int i = 0; i < productionRule.symbols.count; i++) {
                     if (productionRule.symbols.get(i).data.equals(target.data)) {
@@ -73,7 +68,7 @@ public class Ll1 {
         while (nonTerminal.hasMoreElements()) {
             Symbol currentNonTerminal = nonTerminal.nextElement();
             List<Symbol> firstSymbols = firstSet.get(currentNonTerminal);
-            for (Symbol firstSymbol:firstSymbols) {
+            for (Symbol firstSymbol : firstSymbols) {
                 if (firstSymbol.data.equals(epsilon)) {
                     List<Symbol> _symbols1 = followSet.get(currentNonTerminal);
                     for (Symbol _symbol : _symbols1) {
@@ -108,10 +103,12 @@ public class Ll1 {
     static List<String> tokenizeUsingList(String input, List<String> list) {
         List<String> result = new ArrayList<String>();
         while (!input.equals("")) {
+            input = input.trim();
             int i = 0;
             while (list.parallelStream().noneMatch(input.substring(0, i)::contains)) i += 1;
             result.add(input.substring(0, i));
             input = input.substring(i, input.length());
+            input = input.trim();
         }
         return result;
     }
@@ -129,40 +126,31 @@ public class Ll1 {
         stack.push("$");
         stack.push(nonTerminal.data);
 
-        while (!stack.empty()){
-            System.out.println(parsingTable);
-            System.out.print("Stack: ");
-            System.out.println(stack.toString());
-
+        int index = 0;
+        while (!stack.empty()) {
             String stackTop = stack.pop();
-
-            System.out.print("ip String: ");
-            System.out.println(ip.toString());
-
-            if(stackTop.equals(ip.get(0))){
-                stack.pop();
-                ip.remove(0);
-            } else{
-                try{
-                    ProductionRule productionRule = parsingTable.get(stackTop).get(ip.get(0));
-                    for(int i=0; i<productionRule.symbols.count; i++){
-                        stack.push(productionRule.symbols.get(productionRule.symbols.count-1-i).data);
+            if (stackTop.equals(ip.get(index))) {
+                index += 1;
+            } else {
+                try {
+                    ProductionRule productionRule = parsingTable.get(stackTop).get(ip.get(index));
+                    for (int i = 0; i < productionRule.symbols.count; i++) {
+                        stack.push(productionRule.symbols.get(productionRule.symbols.count - 1 - i).data);
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     System.out.println(e);
+                    return 0;
                 }
             }
         }
-        return 0;
+        return 1;
     }
 
     public static void main(String[] args) {
-        String prodRules = "E -> TZ\nZ -> +TZ|ε\nT -> FY\nY -> *FY|ε\nF -> id|(E)";
+        String prodRules = "Stmt->if Expr then Stmt else Stmt|while Expr do Stmt| begin Stmt end|something\nExpr->id";
         // removing left recursion
         prodRules = LeftRecursion.removeLrGrammarString(prodRules);
         Ll1 ll1 = new Ll1(prodRules);
-
-        // System.out.println(ll1.validateString("id", grammar.startSymbol));
-        System.out.println(parsingTable.toString());
+        System.out.println(ll1.validateString("if id then something else something", grammar.startSymbol));
     }
 }

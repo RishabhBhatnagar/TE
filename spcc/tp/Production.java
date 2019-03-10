@@ -11,6 +11,7 @@ class Symbol {
     TypeSymbol typeSymbol;
 
     Symbol(String data, TypeSymbol typeSymbol) {
+        data = data.trim();
         this.data = data;
         this.typeSymbol = typeSymbol;
     }
@@ -193,7 +194,7 @@ class Production {
 class Grammar {
     // This has all the production rules defined.
     int nProductions = 0;     // number of productions.
-    static Production[] productions; // All the productions
+    Production[] productions; // All the productions
     static String grammar;
     String nonTerminalSeparator;
     String productionAssignment;
