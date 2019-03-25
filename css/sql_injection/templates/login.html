@@ -1,0 +1,31 @@
+    <fieldset style="display:inline-block">
+        <legend>Login</legend>
+        <form name='login-form' action="/login" method=get>
+            <table>
+                <tr>
+                    <td>        
+                        UserName:
+                    </td>
+                    <td>
+                        <input type="text" name='uname', placeholder="example@ex.com">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Password:
+                    </td>
+                    <td>
+                        <input type="password" name='pwd'>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type=submit value="Login">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <form name="redirect-register" method=post action="/registeration_form">
+            <input type=submit value="New User? Register...">
+        </form>
+    </fieldset>

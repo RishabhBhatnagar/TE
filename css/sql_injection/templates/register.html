@@ -1,0 +1,58 @@
+<script>
+    document.getElementById("reg_btn").disabled = true;
+    function match_passwords(){
+        pass1 = document.getElementById("pass1");
+        pass2 = document.getElementById("pass2");
+        reg_btn = document.getElementById("reg_btn");
+
+        if(pass1.value == pass2.value){
+           pass2.style.boderColor = "green";
+           reg_btn.disabled = false;
+        } else{
+            pass2.style.borderColor = "red";
+            reg_btn.disabled = true;
+        }
+    }
+</script>
+
+<fieldset style="display:inline-block">
+    <legend>Register</legend>
+    <form name='registration-form' action="/register" method=get>
+        <table>
+            <tr>
+                <td>        
+                    UserName:
+                </td>
+                <td>
+                    <input type="text" name='uname', placeholder="example@ex.com">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Password:
+                </td>
+                <td>
+                    <input type="password" name='pwd' id="pass1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Re-enter Password:
+                </td>
+                <td>
+                    <input type="password" id="pass2" onkeyup=match_passwords()>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type=submit value="Register" id="reg_btn" disabled=true onkeyup=match_passwords()>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <form name="redirect-login" action="/login_form" method=post>
+        <input type=submit value="Already registered? Login">
+    </form>
+</fieldset>
