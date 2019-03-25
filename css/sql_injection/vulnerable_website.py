@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.7
+
 from flask import Flask, app, render_template, request, redirect
 import sqlite3
 import database_manager as db_manager
