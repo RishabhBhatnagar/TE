@@ -39,11 +39,12 @@ class Graph:
             self.epochs += 1
         print(self.epochs, "epochs required to converge.")
         print("Printing some iterations: ")
-        for i in range(1, self.epochs, self.epochs//5):
+        for i in range(1, self.epochs, self.epochs):
             print("Epoch number:", i)
             for j, pr in enumerate(self.history[i]):
                 print("PR({}) = {}".format(ascii_uppercase[j], pr))
             print()
+            input("\n")
 
     def get_all_prs(self):
         for name in ascii_uppercase[:len(self.graph.keys())]:
@@ -53,7 +54,13 @@ class Graph:
     def run_page_rank(self, d=.85):
         for name in ascii_uppercase[:len(self.graph.keys())]:
             node = self.graph[name]
+            print(name, node.pr)
+            print([(ibl, ibl.pr, ibl.outbound_links, ) for ibl in node.inbound_links])
             node.pr = (1-d) + d*sum(ibl.pr/len(ibl.outbound_links) for ibl in node.inbound_links)
+        for name in ascii_uppercase[:len(self.graph.keys())]:
+            print(self.graph[name], self.graph[name].pr)
+
+        input("\n")
 
         for name in ascii_uppercase[:len(self.graph.keys())]:
             node = self.graph[name]
